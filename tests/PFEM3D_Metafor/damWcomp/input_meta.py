@@ -2,11 +2,11 @@ from toolbox.gmsh import GmshImport
 import wrap as w
 import os
 
-# %% Physical group 16 = FSInterface
+# %% Physical group 1 = FSInterface
 
 def params(input):
 
-    input['bndno'] = 16
+    input['bndno'] = 1
     input['saveAllFacs'] = False
     input['bctype'] = 'pydeadloads'
     return input
@@ -29,6 +29,7 @@ def getMetafor(input):
 
     metafor = w.Metafor()
     domain = metafor.getDomain()
+    tsm = metafor.getTimeStepManager()
     materset = domain.getMaterialSet()
     loadingset = domain.getLoadingSet()
     solvermanager = metafor.getSolverManager()
@@ -57,7 +58,7 @@ def getMetafor(input):
 
     materset.define(1,w.ElastHypoMaterial)
     materset(1).put(w.ELASTIC_MODULUS,1e6)
-    materset(1).put(w.MASS_DENSITY,2500)
+    materset(1).put(w.MASS_DENSITY,8e3)
     materset(1).put(w.POISSON_RATIO,0)
     
     # Finite element properties
@@ -72,12 +73,22 @@ def getMetafor(input):
     loadingset.define(groups['SolidBase'],w.Field1D(w.TX,w.RE))
     loadingset.define(groups['SolidBase'],w.Field1D(w.TY,w.RE))
 
-    # Algorithm parameters
+    # Mechanical time integration
+
+    ti = w.AlphaGeneralizedTimeIntegration(metafor)
+    metafor.setTimeIntegration(ti)
+
+    # Mechanical iterations
 
     mim.setMaxNbOfIterations(25)
     mim.setResidualTolerance(1e-8)
-    ti = w.AlphaGeneralizedTimeIntegration(metafor)
-    metafor.setTimeIntegration(ti)
+
+    # Time step iterations
+    
+    tscm = w.NbOfMechNRIterationsTimeStepComputationMethod(metafor)
+    tsm.setTimeStepComputationMethod(tscm)
+    tscm.setTimeStepDivisionFactor(2)
+    tscm.setNbOptiIte(25)
 
     return metafor
 

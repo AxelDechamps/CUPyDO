@@ -8,11 +8,11 @@ Problem = {
 		alpha = 1.2,
 		omega = 0.5,
 		gamma = 0.6,
-		hchar = 6e-3,
+		hchar = 0.01,
 		addOnFS = false,
 		deleteFlyingNodes = false,
 		laplacianSmoothingBoundaries = false,
-		boundingBox = {-0.101,-0.001,0.101,0.151},
+		boundingBox = {-0.01,-0.01,0.61,100},
 		ignoreGroups = {"SolidBase","Solid"},
 		mshFile = "geometry.msh",
 		exclusionZones = {}
@@ -21,47 +21,46 @@ Problem = {
 	Extractors = {
 		{
 			kind = "GMSH",
-			outputFile = "fluid.msh",
-			timeBetweenWriting = 0.1,
+			writeAs = "NodesElements",
+			timeBetweenWriting = 0.01,
 			whatToWrite = {"p","velocity"},
-			writeAs = "NodesElements" 
+			outputFile = "fluid.msh"
 		}
 	},
-	
+
 	Material = {
 		mu = 1e-3,
 		rho = 1000,
 		gamma = 0
 	},
-	
+
 	IC = {
-		ReservoirFixed = false,
-		FSInterfaceFixed = false,
-		InletFixed = true
+		ReservoirFixed = true,
+		FSInterfaceFixed = false
 	},
-	
+
 	Solver = {
 	    id = "PSPG",
 		adaptDT = true,
-		coeffDTincrease = 1.5,
 		coeffDTDecrease = 2,
-		initialDT = 0.1,
-		maxDT = 0.1,
+		coeffDTincrease = 1.5,
+		initialDT = math.huge,
+		maxDT = math.huge,
 		
 		MomContEq = {
 			maxIter = 25,
 			minRes = 1e-8,
-			bodyForce = {0,0},
+			bodyForce = {0,-9.81},
+			externalBC = {"FSInterface"},
 			residual = "Ax_f",
 			nlAlgo = "Picard",
-			BC = {
-			}
+			BC = {}
 		}
 	}
 }
 
 function Problem.IC:initStates(pos)
-	return {0,0,0,0,0}
+	return {0,0,0}
 end
 
 function Problem.Solver.MomContEq.BC:ReservoirV(pos,t)
@@ -69,9 +68,5 @@ function Problem.Solver.MomContEq.BC:ReservoirV(pos,t)
 end
 
 function Problem.Solver.MomContEq.BC:FSInterfaceV(pos,t)
-	return {0,0}
-end
-
-function Problem.Solver.MomContEq.BC:InletV(pos,t)
-	return {0.1,0}
+	return nil
 end

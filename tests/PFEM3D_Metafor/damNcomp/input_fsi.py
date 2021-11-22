@@ -3,8 +3,8 @@ from cupydo.testing import CTest,CTests
 import numpy as np
 import os
 
-def test(mean):
-    
+def test():
+
     name = [file for file in os.listdir() if('fluid' in file)]
     time = [float(file[8:-4]) for file in name]
     lastFile = name[np.argmax(time)]
@@ -12,12 +12,11 @@ def test(mean):
     import gmsh
     gmsh.initialize()
     gmsh.open(lastFile)
-    coord,_ = gmsh.model.mesh.getNode(17)
+    coord,_ = gmsh.model.mesh.getNode(2)
 
     tests = CTests()
-    tests.add(CTest('Mean nb of FSI iterations',mean,3.136273,0.1,True))
-    tests.add(CTest('Solid tip coordinate X',coord[0],0.003118,1e-4,True))
-    tests.add(CTest('Solid tip coordinate Y',coord[1],0.059957,1e-4,True))
+    tests.add(CTest('Solid tip coordinate X',coord[0],0.306162,1e-3,True))
+    tests.add(CTest('Solid tip coordinate Y',coord[1],0.070857,1e-4,True))
     tests.run()
 
 # %% Input Parameters
@@ -47,11 +46,11 @@ def getFsiP():
     param['compType'] = 'unsteady'
     param['timeItTresh'] = 0
     param['omega'] = 0.5
+    param['maxIt'] = 25
+    param['tTot'] = 0.3
     param['tol'] = 1e-8
-    param['maxIt'] = 5
-    param['dt'] = 1e-2
+    param['dt'] = 1e-4
     param['nDim'] = 2
-    param['tTot'] = 5
     
     return param
 
@@ -62,9 +61,7 @@ def main():
     param = getFsiP()
     cupydo = cupy.CUPyDO(param)
     cupydo.run()
-
-    mean = cupydo.algorithm.getMeanNbOfFSIIt()
-    test(mean)
+    test()
 
 if __name__=='__main__':
     main()

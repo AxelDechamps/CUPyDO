@@ -1,5 +1,5 @@
 Problem = {
-    id = "IncompNewtonNoT",
+    id = "WCompNewtonNoT",
 	simulationTime = math.huge,
 	verboseOutput = false,
 	useCupydo = true,
@@ -27,46 +27,47 @@ Problem = {
 			outputFile = "fluid.msh"
 		}
 	},
-
+	
 	Material = {
 		mu = 1e-3,
-		rho = 1000,
+		rhoStar = 1000,
+        K0 = 2.2e+7,
+        K0p = 7.6,
 		gamma = 0
 	},
-
+	
 	IC = {
 		ReservoirFixed = true,
 		FSInterfaceFixed = false
 	},
-
+	
 	Solver = {
-	    id = "PSPG",
 		adaptDT = true,
-		coeffDTincrease = 1.5,
-		coeffDTDecrease = 2,
-		initialDT = 0.1,
-		maxDT = 0.1,
-		
-		MomContEq = {
-			maxIter = 25,
-			minRes = 1e-8,
-			bodyForce = {0,-9.81},
-			residual = "Ax_f",
-			nlAlgo = "Picard",
-			BC = {
-			}
+	    id = "CDS_dpdt",
+		securityCoeff = 0.1,
+		initialDT = math.huge,
+		maxDT = math.huge,
+
+        MomEq = {
+            bodyForce = {0,-9.81},
+            BC = {}
+        },
+        
+        ContEq = {
+            stabilization = "Meduri",
+            BC = {}
 		}
 	}
 }
 
 function Problem.IC:initStates(pos)
-	return {0,0,0,0,0}
+	return {0,0,0,Problem.Material.rhoStar,0,0}
 end
 
-function Problem.Solver.MomContEq.BC:ReservoirV(pos,t)
+function Problem.Solver.MomEq.BC:ReservoirV(pos,t)
 	return {0,0}
 end
 
-function Problem.Solver.MomContEq.BC:FSInterfaceV(pos,t)
-	return {0,0}
+function Problem.Solver.MomEq.BC:FSInterfaceV(pos,t)
+	return nil
 end

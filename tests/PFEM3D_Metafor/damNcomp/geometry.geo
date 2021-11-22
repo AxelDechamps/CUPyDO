@@ -1,7 +1,7 @@
 L = 0.15;
 s = 0.015;
 h = 0.07;
-d = 0.0048;
+d = 0.01;
 
 Point(1) = {0,0,0,d};
 Point(2) = {4*L,0,0,d};
@@ -37,13 +37,12 @@ Plane Surface(2) = {2};
 Transfinite Surface{2};
 Recombine Surface{2};
 
-Physical Curve("FSInterface",16) = {7,8,9};
-Physical Curve("Reservoir",17) = {1,2,3,6,10,11};
-Physical Curve("FreeSurface",18) = {5,4};
-Physical Curve("SolidBase",19) = {12};
+Physical Curve("FSInterface",1) = {7,8,9};
+Physical Curve("Reservoir") = {1,2,3,6,10,11};
+Physical Curve("FreeSurface") = {5,4};
+Physical Curve("SolidBase") = {12};
 
-Physical Surface("Fluid",20) = {1};
-Physical Surface("Solid",21) = {2};
-Physical Surface("SSContact",100) = {};
+Physical Surface("Fluid") = {1};
+Physical Surface("Solid") = {2};
 
 Mesh 2;

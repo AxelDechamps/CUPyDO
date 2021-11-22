@@ -37,12 +37,12 @@ Plane Surface(2) = {2};
 Transfinite Surface{2};
 Recombine Surface{2};
 
-Physical Curve("FSInterface",16) = {7,8,9};
-Physical Curve("Reservoir",17) = {1,2,3,6,10,11};
-Physical Curve("FreeSurface",18) = {5,4};
-Physical Curve("SolidBase",19) = {12};
+Physical Curve("FSInterface",1) = {7,8,9};
+Physical Curve("Reservoir") = {1,2,3,6,10,11};
+Physical Curve("FreeSurface") = {5,4};
+Physical Curve("SolidBase") = {12};
 
-Physical Surface("Fluid",20) = {1};
-Physical Surface("Solid",21) = {2};
+Physical Surface("Fluid") = {1};
+Physical Surface("Solid") = {2};
 
 Mesh 2;
